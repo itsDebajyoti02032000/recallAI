@@ -11,6 +11,7 @@ export function createBedrockClient(credentials: Credentials): BedrockRuntimeCli
     credentials: {
       accessKeyId: credentials.accessKeyId,
       secretAccessKey: credentials.secretAccessKey,
+      ...(credentials.sessionToken && { sessionToken: credentials.sessionToken }),
     },
   });
 }

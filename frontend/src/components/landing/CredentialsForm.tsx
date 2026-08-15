@@ -6,6 +6,7 @@ export function CredentialsForm() {
   const {
     accessKeyId,
     secretAccessKey,
+    sessionToken,
     isValidating,
     error,
     setField,
@@ -44,6 +45,20 @@ export function CredentialsForm() {
           value={secretAccessKey}
           onChange={(e) => setField('secretAccessKey', e.target.value)}
           placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+          className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          autoComplete="off"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-300 mb-1">
+          Session Token <span className="text-slate-500">(optional — required for temporary credentials)</span>
+        </label>
+        <input
+          type="password"
+          value={sessionToken}
+          onChange={(e) => setField('sessionToken', e.target.value)}
+          placeholder="FwoGZXIvYXdzEBYaD..."
           className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           autoComplete="off"
         />

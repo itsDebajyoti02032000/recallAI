@@ -2,6 +2,7 @@ export interface Credentials {
   region: string;
   accessKeyId: string;
   secretAccessKey: string;
+  sessionToken?: string;
 }
 
 export interface ChatRequest {

@@ -107,7 +107,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ abortController });
 
     try {
-      const { region, accessKeyId, secretAccessKey, modelId } = useConnectionStore.getState();
+      const { region, accessKeyId, secretAccessKey, sessionToken, modelId } = useConnectionStore.getState();
       const conversation = get().conversations.find((c) => c.id === conversationId);
       const messages = conversation?.messages
         .filter((m) => !m.isStreaming)
@@ -118,7 +118,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages,
-          credentials: { region, accessKeyId, secretAccessKey },
+          credentials: { region, accessKeyId, secretAccessKey, ...(sessionToken && { sessionToken }) },
           modelId,
         }),
         signal: abortController.signal,

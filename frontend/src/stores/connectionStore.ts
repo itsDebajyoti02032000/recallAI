@@ -4,11 +4,12 @@ interface ConnectionState {
   region: string;
   accessKeyId: string;
   secretAccessKey: string;
+  sessionToken: string;
   modelId: string;
   isConnected: boolean;
   isValidating: boolean;
   error: string | null;
-  setField: (field: 'region' | 'accessKeyId' | 'secretAccessKey' | 'modelId', value: string) => void;
+  setField: (field: 'region' | 'accessKeyId' | 'secretAccessKey' | 'sessionToken' | 'modelId', value: string) => void;
   validate: () => Promise<boolean>;
   disconnect: () => void;
 }
@@ -24,6 +25,7 @@ function loadFromSession(): Partial<ConnectionState> {
         region: parsed.region || 'us-east-1',
         accessKeyId: parsed.accessKeyId || '',
         secretAccessKey: parsed.secretAccessKey || '',
+        sessionToken: parsed.sessionToken || '',
         modelId: parsed.modelId || '',
         isConnected: parsed.isConnected || false,
       };
@@ -38,6 +40,7 @@ function saveToSession(state: ConnectionState) {
       region: state.region,
       accessKeyId: state.accessKeyId,
       secretAccessKey: state.secretAccessKey,
+      sessionToken: state.sessionToken,
       modelId: state.modelId,
       isConnected: state.isConnected,
     }));
@@ -48,6 +51,7 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
   region: 'us-east-1',
   accessKeyId: '',
   secretAccessKey: '',
+  sessionToken: '',
   modelId: '',
   isConnected: false,
   isValidating: false,
@@ -59,7 +63,7 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
   },
 
   validate: async () => {
-    const { region, accessKeyId, secretAccessKey, modelId } = get();
+    const { region, accessKeyId, secretAccessKey, sessionToken, modelId } = get();
 
     if (!accessKeyId || !secretAccessKey || !modelId) {
       set({ error: 'Please fill in all fields.' });
@@ -73,7 +77,7 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          credentials: { region, accessKeyId, secretAccessKey },
+          credentials: { region, accessKeyId, secretAccessKey, ...(sessionToken && { sessionToken }) },
           modelId,
         }),
       });
@@ -99,6 +103,7 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
       isConnected: false,
       accessKeyId: '',
       secretAccessKey: '',
+      sessionToken: '',
       error: null,
     });
     sessionStorage.removeItem(STORAGE_KEY);

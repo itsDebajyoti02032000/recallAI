@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { API_BASE } from '../lib/config';
 
 interface ConnectionState {
   region: string;
@@ -73,7 +74,7 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
     set({ isValidating: true, error: null });
 
     try {
-      const response = await fetch('/api/validate', {
+      const response = await fetch(`${API_BASE}/api/validate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useConnectionStore } from './connectionStore';
+import { API_BASE } from '../lib/config';
 
 export interface Message {
   id: string;
@@ -113,7 +114,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         .filter((m) => !m.isStreaming)
         .map((m) => ({ id: m.id, role: m.role, content: m.content })) ?? [];
 
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

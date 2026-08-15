@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useConnectionStore } from '../../stores/connectionStore';
+import { API_BASE } from '../../lib/config';
 
 interface ModelOption {
   id: string;
@@ -31,7 +32,7 @@ export function ModelSelector() {
     setFetchError(null);
 
     try {
-      const response = await fetch('/api/models', {
+      const response = await fetch(`${API_BASE}/api/models`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

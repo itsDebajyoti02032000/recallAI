@@ -1,6 +1,6 @@
 import type { StreamEvent, ValidateRequest, ValidateResponse } from '@recallai/shared';
 
-const API_BASE = '';
+import { API_BASE } from '../lib/config';
 
 export async function validateCredentials(request: ValidateRequest): Promise<ValidateResponse> {
   const response = await fetch(`${API_BASE}/api/validate`, {

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useConnectionStore } from './connectionStore';
+import { useMemoryStore } from './memoryStore';
 import { API_BASE } from '../lib/config';
 
 export interface Message {
@@ -121,6 +122,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           messages,
           credentials: { region, accessKeyId, secretAccessKey, ...(sessionToken && { sessionToken }) },
           modelId,
+          conversationId,
         }),
         signal: abortController.signal,
       });
@@ -144,6 +146,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
           const data = JSON.parse(line.slice(6));
+
+          if (data.type === 'memory_context') {
+            useMemoryStore.getState().setActiveMemoryIds(data.memoryIds || []);
+          }
 
           if (data.type === 'delta' && data.text) {
             set((state) => ({
@@ -210,6 +216,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }
     } finally {
       set({ isGenerating: false, abortController: null });
+      setTimeout(() => {
+        const memoryStore = useMemoryStore.getState();
+        if (memoryStore.isPanelOpen) {
+          memoryStore.fetchMemories();
+          memoryStore.fetchStats();
+        }
+      }, 3000);
     }
   },
 

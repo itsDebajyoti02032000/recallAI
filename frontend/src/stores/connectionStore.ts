@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { API_BASE } from '../lib/config';
+import { generateUserId } from '../lib/userId';
 
 interface ConnectionState {
   region: string;
@@ -7,6 +8,7 @@ interface ConnectionState {
   secretAccessKey: string;
   sessionToken: string;
   modelId: string;
+  userId: string;
   isConnected: boolean;
   isValidating: boolean;
   error: string | null;
@@ -54,6 +56,7 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
   secretAccessKey: '',
   sessionToken: '',
   modelId: '',
+  userId: '',
   isConnected: false,
   isValidating: false,
   error: null,
@@ -86,7 +89,8 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
       const data = await response.json();
 
       if (data.success) {
-        set({ isConnected: true, isValidating: false });
+        const userId = await generateUserId(accessKeyId);
+        set({ isConnected: true, isValidating: false, userId });
         saveToSession(get());
         return true;
       } else {

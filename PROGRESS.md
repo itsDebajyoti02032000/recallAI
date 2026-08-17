@@ -45,16 +45,25 @@
 ```
 Browser (React + Vite + Tailwind) — Cloudflare Pages
     │
-    │  POST /api/chat (credentials + messages)
+    │  POST /api/chat (credentials + messages + conversationId)
     │  POST /api/validate
     │  POST /api/models
-    │  Response: text/event-stream (SSE)
+    │  POST /api/memories/* (list, search, update, delete, stats)
+    │  Response: text/event-stream (SSE with memory_context events)
     ▼
 Cloudflare Worker (Hono) — Cloudflare Workers
     │
-    │  ConverseStreamCommand (user's credentials)
+    │  1. Retrieve relevant memories (D1 + cosine similarity)
+    │  2. Build dynamic system prompt (base + memory context)
+    │  3. ConverseStreamCommand (user's credentials)
+    │  4. Background: extract new memories (waitUntil)
     ▼
 Amazon Bedrock (user's AWS account)
+    ├── Chat model (user-selected, e.g. Claude, Titan)
+    └── amazon.titan-embed-text-v2:0 (1024-dim embeddings)
+    
+Cloudflare D1 (SQLite)
+    └── memories table (per-user, with embeddings as JSON)
 ```
 
 ### Tech Stack
@@ -66,23 +75,26 @@ Amazon Bedrock (user's AWS account)
 
 ---
 
-## Stage 2: Memory + MCP Layer — TODO
+## Stage 2: Memory + MCP Layer — IN PROGRESS
 
-### 2A: Memory System
+### 2A: Memory System — DONE
 
 | Feature | Status |
 |---------|--------|
-| Mem0 OSS integration | Not Started |
-| Short-term memory (conversation context) | Not Started |
-| Long-term semantic memory (user facts/preferences) | Not Started |
-| Episodic memory (past interaction summaries) | Not Started |
-| Memory importance scoring | Not Started |
-| Memory retrieval on relevant queries | Not Started |
-| Memory creation from conversations | Not Started |
-| Memory update/deletion | Not Started |
-| Memory Inspector UI panel | Not Started |
-| Memory persistence (Cloudflare D1 or KV) | Not Started |
-| Memory isolation per user/session | Not Started |
+| Memory-inspired architecture (extract/store/retrieve) | Done |
+| Short-term memory (conversation context) | Done (existing message history) |
+| Long-term semantic memory (user facts/preferences) | Done |
+| Episodic memory (past interaction summaries) | Done |
+| Memory importance scoring (1-10 scale) | Done |
+| Memory retrieval on relevant queries (cosine similarity) | Done |
+| Memory creation from conversations (LLM extraction) | Done |
+| Memory update/deletion (full CRUD) | Done |
+| Memory Inspector UI panel (right-side, collapsible) | Done |
+| Memory persistence (Cloudflare D1) | Done |
+| Memory isolation per user (SHA-256 hash of accessKeyId) | Done |
+| Embedding generation (Bedrock Titan Embed v2) | Done |
+| Dynamic system prompt with memory injection | Done |
+| Background memory extraction (waitUntil) | Done |
 
 ### 2B: MCP Architecture
 
@@ -115,13 +127,27 @@ Amazon Bedrock (user's AWS account)
 
 ---
 
-## Stage 2 Decisions Still Needed
+## Stage 2A Deployment Steps (Required)
 
-- **Mem0 persistence:** Where to store vectors — Cloudflare Vectorize? External free vector DB? In-memory with D1 fallback?
+```powershell
+# 1. Create D1 database
+cd "C:\Generative Ai\Personal Projects Portfolio\RecallAI\backend"
+npx wrangler d1 create recallai-memory
+# Copy the database_id from output into wrangler.toml
+
+# 2. Run migrations
+npx wrangler d1 migrations apply recallai-memory --local   # local dev
+npx wrangler d1 migrations apply recallai-memory --remote  # production
+
+# 3. Deploy
+npx wrangler deploy
+```
+
+## Stage 2 Decisions Still Needed (for 2B/2C/2D)
+
 - **SearXNG hosting:** Self-host on free tier somewhere? Use a public instance?
 - **MCP SDK choice:** Which MCP SDK version/library for the client and servers?
 - **Agent routing:** LLM-driven tool selection vs rule-based router?
-- **Memory scoping:** Session-based user ID vs persistent accounts?
 
 ---
 

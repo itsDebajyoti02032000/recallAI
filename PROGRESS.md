@@ -96,15 +96,17 @@ Cloudflare D1 (SQLite)
 | Dynamic system prompt with memory injection | Done |
 | Background memory extraction (waitUntil) | Done |
 
-### 2B: MCP Architecture
+### 2B: MCP Architecture — DONE
 
 | Feature | Status |
 |---------|--------|
-| MCP Client in the agent | Not Started |
-| Memory MCP Server (memory.search, memory.add, memory.get, memory.update, memory.delete) | Not Started |
-| Web Search MCP Server (web.search, web.fetch) | Not Started |
-| MCP tool execution UI / activity indicator | Not Started |
-| Agent router (decide: memory needed? web needed? direct answer?) | Not Started |
+| MCP Client in the agent (agent-loop with multi-turn tool_use) | Done |
+| Memory MCP Server (memory_search, memory_add, memory_get, memory_update, memory_delete, memory_list) | Done |
+| Web Search MCP Server (web_search, web_fetch — placeholder for 2C) | Done |
+| MCP tool execution UI / activity indicator | Done |
+| Agent router (LLM-driven via Bedrock toolConfig, toolChoice: auto) | Done |
+| Tool registry with in-process MCP pattern | Done |
+| Fallback for models without tool_use support | Done |
 
 ### 2C: Web Search
 
@@ -143,11 +145,15 @@ npx wrangler d1 migrations apply recallai-memory --remote  # production
 npx wrangler deploy
 ```
 
-## Stage 2 Decisions Still Needed (for 2B/2C/2D)
+## Stage 2 Decisions Made
+
+- **MCP Architecture:** In-process MCP pattern (tool servers as TypeScript modules inside the Worker)
+- **Agent routing:** LLM-driven via Bedrock Converse API `toolConfig` with `toolChoice: { auto: {} }`
+- **Tool execution:** Multi-turn agent loop — streams text + tool activity events via SSE
+
+## Stage 2 Decisions Still Needed (for 2C/2D)
 
 - **SearXNG hosting:** Self-host on free tier somewhere? Use a public instance?
-- **MCP SDK choice:** Which MCP SDK version/library for the client and servers?
-- **Agent routing:** LLM-driven tool selection vs rule-based router?
 
 ---
 

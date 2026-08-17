@@ -1,6 +1,6 @@
 # RecallAI — Progress Tracker
 
-## Project Status: Stage 1 Complete (Deployed)
+## Project Status: Stage 2A Complete (Memory System Deployed)
 
 **Live URLs:**
 - Frontend: https://recallai-5ru.pages.dev
@@ -70,6 +70,8 @@ Cloudflare D1 (SQLite)
 
 - **Frontend:** React 19, TypeScript, Vite 6, Tailwind CSS 3, Zustand 5
 - **Backend:** Cloudflare Workers, Hono 4, AWS SDK v3
+- **Database:** Cloudflare D1 (SQLite on edge)
+- **Embeddings:** Amazon Titan Embed Text v2 (1024-dim, via Bedrock)
 - **Deployment:** Cloudflare Pages + Workers (free tier)
 - **CI/CD:** GitHub Actions (auto-deploy on push to main)
 
@@ -127,21 +129,12 @@ Cloudflare D1 (SQLite)
 
 ---
 
-## Stage 2A Deployment Steps (Required)
+## Stage 2A Deployment — COMPLETED
 
-```powershell
-# 1. Create D1 database
-cd "C:\Generative Ai\Personal Projects Portfolio\RecallAI\backend"
-npx wrangler d1 create recallai-memory
-# Copy the database_id from output into wrangler.toml
-
-# 2. Run migrations
-npx wrangler d1 migrations apply recallai-memory --local   # local dev
-npx wrangler d1 migrations apply recallai-memory --remote  # production
-
-# 3. Deploy
-npx wrangler deploy
-```
+- D1 Database: `recallai-memory` (ID: 83370e35-38f9-40f2-a7e8-85e3b625ef9c)
+- Migration `0001_create_memories.sql` applied to production
+- Worker deployed with D1 binding active
+- Memory system live and operational
 
 ## Stage 2 Decisions Still Needed (for 2B/2C/2D)
 
@@ -178,3 +171,5 @@ npm run dev:frontend   # localhost:5173
 3. `feat: fetch models dynamically from Bedrock ListFoundationModels API`
 4. `feat: configure production API URL and deploy to Cloudflare`
 5. `ci: add GitHub Actions workflow for Cloudflare deployment`
+6. `feat: implement Memory System 2A with semantic retrieval` — D1 database, LLM extraction, Titan Embed, cosine similarity retrieval, Memory Inspector panel, memory-augmented chat
+7. `chore: update D1 database_id to production value`

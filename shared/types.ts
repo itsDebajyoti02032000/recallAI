@@ -28,7 +28,7 @@ export interface ValidateResponse {
 }
 
 export interface StreamEvent {
-  type: 'delta' | 'done' | 'error' | 'memory_context';
+  type: 'delta' | 'done' | 'error' | 'memory_context' | 'tool_start' | 'tool_result';
   text?: string;
   message?: string;
   memoryIds?: string[];
@@ -37,6 +37,21 @@ export interface StreamEvent {
     inputTokens: number;
     outputTokens: number;
   };
+  toolUseId?: string;
+  toolName?: string;
+  input?: Record<string, unknown>;
+  result?: unknown;
+  success?: boolean;
+}
+
+export interface ToolCall {
+  toolUseId: string;
+  toolName: string;
+  status: 'running' | 'completed' | 'error';
+  input?: Record<string, unknown>;
+  result?: unknown;
+  startedAt: number;
+  completedAt?: number;
 }
 
 // Memory System Types

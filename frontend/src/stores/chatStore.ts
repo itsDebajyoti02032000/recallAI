@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { useConnectionStore } from './connectionStore';
 import { useMemoryStore } from './memoryStore';
+import { useAgentStore } from './agentStore';
 import { API_BASE } from '../lib/config';
 
 export interface Message {
@@ -151,6 +152,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
             useMemoryStore.getState().setActiveMemoryIds(data.memoryIds || []);
           }
 
+          if (data.type === 'tool_start') {
+            useAgentStore.getState().addToolCall(data.toolUseId, data.toolName, data.input);
+          }
+
+          if (data.type === 'tool_result') {
+            useAgentStore.getState().completeToolCall(data.toolUseId, data.result, data.success);
+          }
+
           if (data.type === 'delta' && data.text) {
             set((state) => ({
               conversations: state.conversations.map((c) => {
@@ -216,6 +225,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }
     } finally {
       set({ isGenerating: false, abortController: null });
+      useAgentStore.getState().clearToolCalls();
       setTimeout(() => {
         const memoryStore = useMemoryStore.getState();
         if (memoryStore.isPanelOpen) {

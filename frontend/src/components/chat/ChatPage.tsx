@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useChatStore } from '../../stores/chatStore';
 import { useConnectionStore } from '../../stores/connectionStore';
 import { useMemoryStore } from '../../stores/memoryStore';
+import { useAgentStore } from '../../stores/agentStore';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { MemoryPanel } from '../memory/MemoryPanel';
@@ -12,6 +13,7 @@ export function ChatPage() {
   const createConversation = useChatStore((s) => s.createConversation);
   const modelId = useConnectionStore((s) => s.modelId);
   const { isPanelOpen, togglePanel, stats } = useMemoryStore();
+  const { showActivityPanel, toggleActivityPanel, isUsingTools } = useAgentStore();
 
   const conversation = conversations.find((c) => c.id === activeConversationId);
 
@@ -32,6 +34,22 @@ export function ChatPage() {
             <span className="px-2 py-1 bg-slate-700 rounded-md">
               {modelId.split('.').pop()?.split('-v')[0] || modelId}
             </span>
+            <button
+              onClick={toggleActivityPanel}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${
+                showActivityPanel
+                  ? 'bg-amber-500/20 text-amber-400'
+                  : 'hover:bg-slate-700 text-slate-400 hover:text-slate-200'
+              }`}
+              title="Agent Activity"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              {isUsingTools && (
+                <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
+              )}
+            </button>
             <button
               onClick={togglePanel}
               className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${

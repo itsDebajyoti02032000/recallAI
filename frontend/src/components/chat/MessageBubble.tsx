@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { useMemoryStore } from '../../stores/memoryStore';
+import { useAgentStore } from '../../stores/agentStore';
+import { AgentActivityPanel } from '../agent/AgentActivityPanel';
 import type { Message } from '../../stores/chatStore';
 
 interface Props {
@@ -11,8 +13,10 @@ export function MessageBubble({ message }: Props) {
   const [copied, setCopied] = useState(false);
   const activeMemoryIds = useMemoryStore((s) => s.activeMemoryIds);
   const togglePanel = useMemoryStore((s) => s.togglePanel);
+  const activeToolCalls = useAgentStore((s) => s.activeToolCalls);
   const isUser = message.role === 'user';
   const hasMemoryContext = !isUser && activeMemoryIds.length > 0;
+  const showAgentActivity = !isUser && message.isStreaming && activeToolCalls.length > 0;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content);
@@ -33,7 +37,8 @@ export function MessageBubble({ message }: Props) {
           <p className="whitespace-pre-wrap">{message.content}</p>
         ) : (
           <>
-            {message.isStreaming && !message.content ? (
+            {showAgentActivity && <AgentActivityPanel />}
+            {message.isStreaming && !message.content && activeToolCalls.length === 0 ? (
               <div className="flex items-center gap-1">
                 <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                 <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />

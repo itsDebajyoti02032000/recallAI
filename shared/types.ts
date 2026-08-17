@@ -28,11 +28,78 @@ export interface ValidateResponse {
 }
 
 export interface StreamEvent {
-  type: 'delta' | 'done' | 'error';
+  type: 'delta' | 'done' | 'error' | 'memory_context';
   text?: string;
   message?: string;
+  memoryIds?: string[];
+  memoryCount?: number;
   usage?: {
     inputTokens: number;
     outputTokens: number;
   };
+}
+
+// Memory System Types
+
+export type MemoryType = 'fact' | 'preference' | 'episodic';
+
+export interface Memory {
+  id: string;
+  userId: string;
+  type: MemoryType;
+  content: string;
+  importance: number;
+  sourceConversationId?: string;
+  sourceMessageId?: string;
+  createdAt: string;
+  updatedAt: string;
+  accessedAt: string;
+  accessCount: number;
+}
+
+export interface MemoryListRequest {
+  credentials: Credentials;
+  type?: MemoryType;
+  limit?: number;
+  offset?: number;
+}
+
+export interface MemoryListResponse {
+  success: boolean;
+  memories: Memory[];
+  total: number;
+  error?: string;
+}
+
+export interface MemorySearchRequest {
+  credentials: Credentials;
+  query: string;
+  limit?: number;
+}
+
+export interface MemorySearchResponse {
+  success: boolean;
+  memories: (Memory & { similarity: number })[];
+  error?: string;
+}
+
+export interface MemoryUpdateRequest {
+  credentials: Credentials;
+  memoryId: string;
+  content?: string;
+  importance?: number;
+  type?: MemoryType;
+}
+
+export interface MemoryDeleteRequest {
+  credentials: Credentials;
+  memoryId: string;
+}
+
+export interface MemoryStatsResponse {
+  success: boolean;
+  total: number;
+  facts: number;
+  preferences: number;
+  episodic: number;
 }

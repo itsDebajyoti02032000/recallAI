@@ -46,14 +46,15 @@ export async function validateCredentials(
 export async function* streamChat(
   credentials: Credentials,
   modelId: string,
-  messages: ChatMessage[]
+  messages: ChatMessage[],
+  systemPrompt?: string
 ) {
   const client = createBedrockClient(credentials);
 
   const command = new ConverseStreamCommand({
     modelId,
     messages: formatMessages(messages),
-    system: [{ text: 'You are RecallAI, a helpful and knowledgeable AI assistant. Provide clear, accurate, and well-structured responses.' }],
+    system: [{ text: systemPrompt || 'You are RecallAI, a helpful and knowledgeable AI assistant. Provide clear, accurate, and well-structured responses.' }],
     inferenceConfig: {
       maxTokens: 4096,
       temperature: 0.7,

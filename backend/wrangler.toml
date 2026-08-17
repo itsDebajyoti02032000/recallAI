@@ -5,3 +5,9 @@ compatibility_flags = ["nodejs_compat"]
 
 [dev]
 port = 8787
+
+[[d1_databases]]
+binding = "DB"
+database_name = "recallai-memory"
+database_id = "placeholder-create-with-wrangler-d1-create"
+migrations_dir = "migrations"

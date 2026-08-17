@@ -48,7 +48,7 @@ export function MessageBubble({ message }: Props) {
               <MarkdownRenderer content={message.content} />
             )}
             {message.content && !message.isStreaming && (
-              <div className="mt-2 flex items-center gap-2 border-t border-slate-700 pt-2">
+              <div className="mt-2 flex items-center gap-2 flex-wrap border-t border-slate-700 pt-2">
                 <button
                   onClick={handleCopy}
                   className="text-xs text-slate-400 hover:text-slate-200 transition-colors"
@@ -66,6 +66,18 @@ export function MessageBubble({ message }: Props) {
                     </svg>
                     Memory
                   </button>
+                )}
+                {message.toolsUsed && message.toolsUsed.length > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    {message.toolsUsed.map((tool) => (
+                      <span key={tool} className="px-1.5 py-0.5 text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded">
+                        {tool.replace('_', ' ')}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
             )}

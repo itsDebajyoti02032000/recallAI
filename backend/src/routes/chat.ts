@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { classifyError } from '../lib/bedrock';
 import { hashAccessKeyId } from '../lib/user-identity';
-import { retrieveRelevantMemories, buildMemoryContext } from '../lib/memory-retriever';
 import { buildSystemPrompt } from '../lib/system-prompt';
 import { extractAndStoreMemories } from '../lib/memory-pipeline';
 import { runAgentLoop } from '../lib/agent-loop';
@@ -28,27 +27,7 @@ chatRoute.post('/chat', async (c) => {
     }
 
     const userId = await hashAccessKeyId(body.credentials.accessKeyId);
-    const lastUserMessage = body.messages[body.messages.length - 1]?.content || '';
-
-    let memoryContext: string = '';
-    let memoryIds: string[] = [];
-
-    try {
-      const relevantMemories = await retrieveRelevantMemories(
-        c.env.DB,
-        body.credentials,
-        userId,
-        lastUserMessage
-      );
-      if (relevantMemories.length > 0) {
-        memoryContext = buildMemoryContext(relevantMemories);
-        memoryIds = relevantMemories.map((m) => m.id);
-      }
-    } catch {
-      // Memory retrieval is best-effort
-    }
-
-    const systemPrompt = buildSystemPrompt(memoryContext || null);
+    const systemPrompt = buildSystemPrompt(null);
     const encoder = new TextEncoder();
     let fullResponse = '';
 
@@ -61,15 +40,6 @@ chatRoute.post('/chat', async (c) => {
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          if (memoryIds.length > 0) {
-            const memoryEvent = JSON.stringify({
-              type: 'memory_context',
-              memoryIds,
-              memoryCount: memoryIds.length,
-            });
-            controller.enqueue(encoder.encode(`data: ${memoryEvent}\n\n`));
-          }
-
           for await (const event of runAgentLoop({
             credentials: body.credentials,
             modelId: body.modelId,

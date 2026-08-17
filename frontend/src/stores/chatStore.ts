@@ -10,6 +10,7 @@ export interface Message {
   content: string;
   timestamp: number;
   isStreaming?: boolean;
+  toolsUsed?: string[];
 }
 
 export interface Conversation {
@@ -135,6 +136,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      const toolsUsedSet = new Set<string>();
 
       while (true) {
         const { done, value } = await reader.read();
@@ -153,11 +155,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
           }
 
           if (data.type === 'tool_start') {
+            toolsUsedSet.add(data.toolName);
             useAgentStore.getState().addToolCall(data.toolUseId, data.toolName, data.input);
           }
 
           if (data.type === 'tool_result') {
             useAgentStore.getState().completeToolCall(data.toolUseId, data.result, data.success);
+            if (data.toolName === 'memory_search' && data.success && data.result?.memories) {
+              const ids = data.result.memories.map((m: any) => m.id).filter(Boolean);
+              if (ids.length > 0) {
+                useMemoryStore.getState().setActiveMemoryIds(ids);
+              }
+            }
           }
 
           if (data.type === 'delta' && data.text) {
@@ -193,13 +202,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
           }
 
           if (data.type === 'done') {
+            const toolsUsed = toolsUsedSet.size > 0 ? [...toolsUsedSet] : undefined;
             set((state) => ({
               conversations: state.conversations.map((c) => {
                 if (c.id !== conversationId) return c;
                 return {
                   ...c,
                   messages: c.messages.map((m) =>
-                    m.id === assistantMessage.id ? { ...m, isStreaming: false } : m
+                    m.id === assistantMessage.id ? { ...m, isStreaming: false, toolsUsed } : m
                   ),
                 };
               }),

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MarkdownRenderer } from './MarkdownRenderer';
+import { SourcesCitation } from './SourcesCitation';
 import { useMemoryStore } from '../../stores/memoryStore';
 import { useAgentStore } from '../../stores/agentStore';
 import { AgentActivityPanel } from '../agent/AgentActivityPanel';
@@ -78,6 +79,9 @@ export function MessageBubble({ message }: Props) {
                       </span>
                     ))}
                   </div>
+                )}
+                {message.sources && message.sources.length > 0 && (
+                  <SourcesCitation sources={message.sources} />
                 )}
               </div>
             )}

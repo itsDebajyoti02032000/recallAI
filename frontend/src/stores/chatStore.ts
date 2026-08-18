@@ -3,6 +3,7 @@ import { useConnectionStore } from './connectionStore';
 import { useMemoryStore } from './memoryStore';
 import { useAgentStore } from './agentStore';
 import { API_BASE } from '../lib/config';
+import type { SearchSource } from '../../../shared/types';
 
 export interface Message {
   id: string;
@@ -11,6 +12,7 @@ export interface Message {
   timestamp: number;
   isStreaming?: boolean;
   toolsUsed?: string[];
+  sources?: SearchSource[];
 }
 
 export interface Conversation {
@@ -137,6 +139,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const decoder = new TextDecoder();
       let buffer = '';
       const toolsUsedSet = new Set<string>();
+      const sourcesMap = new Map<string, SearchSource>();
 
       while (true) {
         const { done, value } = await reader.read();
@@ -165,6 +168,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
               const ids = data.result.memories.map((m: any) => m.id).filter(Boolean);
               if (ids.length > 0) {
                 useMemoryStore.getState().setActiveMemoryIds(ids);
+              }
+            }
+            if (data.toolName === 'web_search' && data.success && data.result?.results) {
+              for (const r of data.result.results) {
+                if (r.url && !sourcesMap.has(r.url)) {
+                  sourcesMap.set(r.url, { title: r.title, url: r.url, snippet: r.snippet });
+                }
               }
             }
           }
@@ -203,13 +213,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
           if (data.type === 'done') {
             const toolsUsed = toolsUsedSet.size > 0 ? [...toolsUsedSet] : undefined;
+            const sources = sourcesMap.size > 0 ? [...sourcesMap.values()] : undefined;
             set((state) => ({
               conversations: state.conversations.map((c) => {
                 if (c.id !== conversationId) return c;
                 return {
                   ...c,
                   messages: c.messages.map((m) =>
-                    m.id === assistantMessage.id ? { ...m, isStreaming: false, toolsUsed } : m
+                    m.id === assistantMessage.id ? { ...m, isStreaming: false, toolsUsed, sources } : m
                   ),
                 };
               }),

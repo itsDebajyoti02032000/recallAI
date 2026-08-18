@@ -108,15 +108,20 @@ Cloudflare D1 (SQLite)
 | Tool registry with in-process MCP pattern | Done |
 | Fallback for models without tool_use support | Done |
 
-### 2C: Web Search
+### 2C: Web Search — DONE (Deployed & Verified)
 
 | Feature | Status |
 |---------|--------|
-| SearXNG integration | Not Started |
-| Search decision logic (when to search) | Not Started |
-| Search result extraction | Not Started |
-| Source citations with clickable links | Not Started |
-| Search activity indicator in UI | Not Started |
+| Self-hosted SearXNG on Render.com (Docker, free tier) | Done |
+| SearXNG JSON API integration with instance rotation + fallback | Done |
+| Search decision logic (LLM-driven via system prompt + tool descriptions) | Done |
+| Multi-turn search refinement (agent retries with better queries) | Done |
+| Search result extraction (structured JSON: title, url, snippet, engine) | Done |
+| Web page content extraction (HTMLRewriter, truncated to 8K) | Done |
+| Source citations with clickable links (SourcesCitation component) | Done |
+| Inline markdown link citations (LLM generates [text](url)) | Done |
+| Search activity indicator in UI (ToolCallCard: "Searching the web") | Done |
+| External link styling with open-in-new-tab icon | Done |
 
 ### 2D: Agent Activity Panel
 
@@ -151,9 +156,13 @@ npx wrangler deploy
 - **Agent routing:** LLM-driven via Bedrock Converse API `toolConfig` with `toolChoice: { auto: {} }`
 - **Tool execution:** Multi-turn agent loop — streams text + tool activity events via SSE
 
-## Stage 2 Decisions Still Needed (for 2C/2D)
+## Stage 2 Decisions Made (2C)
 
-- **SearXNG hosting:** Self-host on free tier somewhere? Use a public instance?
+- **Web Search Provider:** Self-hosted SearXNG on Render.com (Docker, free tier). Public instances were unreliable (429s, captchas). Self-hosting with `limiter: false` gives full control.
+- **SearXNG Instance URL:** https://recallai-searxng.onrender.com
+- **Engines enabled:** Google, Bing, DuckDuckGo, Wikipedia, Brave
+- **Content extraction:** Cloudflare Workers HTMLRewriter API (strips nav/scripts, extracts article text, 8K char limit)
+- **Citation approach:** Dual — LLM cites inline via markdown links + SourcesCitation component in message footer shows all referenced URLs
 
 ---
 

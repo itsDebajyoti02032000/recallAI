@@ -27,15 +27,16 @@ interface SearXNGAPIResponse {
   number_of_results?: number;
 }
 
-// Public SearXNG instances that support JSON API
-// See: https://searx.space for a live list of available instances
+// Self-hosted SearXNG instance (primary) + public fallbacks
+// Deploy your own via the /searxng directory in this repo (Render.com, Fly.io, etc.)
+// See: https://docs.searxng.org/dev/search_api.html
 const INSTANCES = [
+  'https://recallai-searxng.onrender.com',
   'https://search.sapti.me',
   'https://searx.be',
   'https://paulgo.io',
   'https://searx.tiekoetter.com',
   'https://opnxng.com',
-  'https://search.bus-hit.me',
   'https://priv.au',
   'https://search.rhscz.eu',
   'https://etsi.me',

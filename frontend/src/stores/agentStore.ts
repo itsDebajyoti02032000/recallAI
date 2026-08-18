@@ -10,6 +10,7 @@ interface AgentState {
   completeToolCall: (toolUseId: string, result: unknown, success: boolean) => void;
   clearToolCalls: () => void;
   toggleActivityPanel: () => void;
+  closeActivityPanel: () => void;
 }
 
 export const useAgentStore = create<AgentState>((set) => ({
@@ -48,4 +49,6 @@ export const useAgentStore = create<AgentState>((set) => ({
   clearToolCalls: () => set({ activeToolCalls: [], isUsingTools: false }),
 
   toggleActivityPanel: () => set((s) => ({ showActivityPanel: !s.showActivityPanel })),
+
+  closeActivityPanel: () => set({ showActivityPanel: false }),
 }));

@@ -6,14 +6,15 @@ import { useAgentStore } from '../../stores/agentStore';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { MemoryPanel } from '../memory/MemoryPanel';
+import { AgentActivitySidePanel } from '../agent/AgentActivitySidePanel';
 
 export function ChatPage() {
   const activeConversationId = useChatStore((s) => s.activeConversationId);
   const conversations = useChatStore((s) => s.conversations);
   const createConversation = useChatStore((s) => s.createConversation);
   const modelId = useConnectionStore((s) => s.modelId);
-  const { isPanelOpen, togglePanel, stats } = useMemoryStore();
-  const { showActivityPanel, toggleActivityPanel, isUsingTools } = useAgentStore();
+  const { isPanelOpen, togglePanel, closePanel: closeMemoryPanel, stats } = useMemoryStore();
+  const { showActivityPanel, toggleActivityPanel, closeActivityPanel, isUsingTools } = useAgentStore();
 
   const conversation = conversations.find((c) => c.id === activeConversationId);
 
@@ -35,7 +36,10 @@ export function ChatPage() {
               {modelId.split('.').pop()?.split('-v')[0] || modelId}
             </span>
             <button
-              onClick={toggleActivityPanel}
+              onClick={() => {
+                if (!showActivityPanel) closeMemoryPanel();
+                toggleActivityPanel();
+              }}
               className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${
                 showActivityPanel
                   ? 'bg-amber-500/20 text-amber-400'
@@ -51,7 +55,10 @@ export function ChatPage() {
               )}
             </button>
             <button
-              onClick={togglePanel}
+              onClick={() => {
+                if (!isPanelOpen) closeActivityPanel();
+                togglePanel();
+              }}
               className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${
                 isPanelOpen
                   ? 'bg-indigo-500/20 text-indigo-400'
@@ -74,6 +81,7 @@ export function ChatPage() {
       </div>
 
       {isPanelOpen && <MemoryPanel />}
+      {showActivityPanel && <AgentActivitySidePanel onClose={closeActivityPanel} />}
     </div>
   );
 }

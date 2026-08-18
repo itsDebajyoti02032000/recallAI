@@ -13,6 +13,7 @@ interface MemoryState {
   activeMemoryIds: string[];
 
   togglePanel: () => void;
+  closePanel: () => void;
   setFilter: (filter: MemoryType | 'all') => void;
   setSearchQuery: (query: string) => void;
   fetchMemories: () => Promise<void>;
@@ -44,6 +45,8 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
       get().fetchStats();
     }
   },
+
+  closePanel: () => set({ isPanelOpen: false }),
 
   setFilter: (filter) => {
     set({ filter });

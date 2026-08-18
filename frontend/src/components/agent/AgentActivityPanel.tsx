@@ -3,9 +3,8 @@ import { ToolCallCard } from './ToolCallCard';
 
 export function AgentActivityPanel() {
   const activeToolCalls = useAgentStore((s) => s.activeToolCalls);
-  const showActivityPanel = useAgentStore((s) => s.showActivityPanel);
 
-  if (!showActivityPanel || activeToolCalls.length === 0) return null;
+  if (activeToolCalls.length === 0) return null;
 
   return (
     <div className="mt-2 px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-lg space-y-1.5">

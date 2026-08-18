@@ -3,7 +3,7 @@ import { useConnectionStore } from './connectionStore';
 import { useMemoryStore } from './memoryStore';
 import { useAgentStore } from './agentStore';
 import { API_BASE } from '../lib/config';
-import type { SearchSource } from '../../../shared/types';
+import type { SearchSource, ToolCall } from '../../../shared/types';
 
 export interface Message {
   id: string;
@@ -12,6 +12,7 @@ export interface Message {
   timestamp: number;
   isStreaming?: boolean;
   toolsUsed?: string[];
+  toolCalls?: ToolCall[];
   sources?: SearchSource[];
 }
 
@@ -246,6 +247,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }
     } finally {
       set({ isGenerating: false, abortController: null });
+      const completedCalls = useAgentStore.getState().activeToolCalls;
+      if (completedCalls.length > 0) {
+        set((state) => ({
+          conversations: state.conversations.map((c) => {
+            if (c.id !== conversationId) return c;
+            return {
+              ...c,
+              messages: c.messages.map((m) =>
+                m.id === assistantMessage.id ? { ...m, toolCalls: [...completedCalls] } : m
+              ),
+            };
+          }),
+        }));
+      }
       useAgentStore.getState().clearToolCalls();
       setTimeout(() => {
         const memoryStore = useMemoryStore.getState();

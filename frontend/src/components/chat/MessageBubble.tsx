@@ -69,7 +69,14 @@ export function MessageBubble({ message }: Props) {
                   </button>
                 )}
                 {message.toolsUsed && message.toolsUsed.length > 0 && (
-                  <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => {
+                      const store = useAgentStore.getState();
+                      if (!store.showActivityPanel) store.toggleActivityPanel();
+                    }}
+                    className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+                    title="View agent activity"
+                  >
                     <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
@@ -78,7 +85,7 @@ export function MessageBubble({ message }: Props) {
                         {tool.replace('_', ' ')}
                       </span>
                     ))}
-                  </div>
+                  </button>
                 )}
                 {message.sources && message.sources.length > 0 && (
                   <SourcesCitation sources={message.sources} />

@@ -75,7 +75,7 @@ Cloudflare D1 (SQLite)
 
 ---
 
-## Stage 2: Memory + MCP Layer — IN PROGRESS
+## Stage 2: Memory + MCP Layer — DONE
 
 ### 2A: Memory System — DONE
 
@@ -123,14 +123,21 @@ Cloudflare D1 (SQLite)
 | Search activity indicator in UI (ToolCallCard: "Searching the web") | Done |
 | External link styling with open-in-new-tab icon | Done |
 
-### 2D: Agent Activity Panel
+### 2D: Agent Activity Panel — DONE
 
 | Feature | Status |
 |---------|--------|
-| Tool/action summary display | Not Started |
-| Memory usage indicator | Not Started |
-| Web search indicator | Not Started |
-| MCP tool execution indicator | Not Started |
+| Dedicated right-side panel (w-80, like Memory Inspector) | Done |
+| Tool call history persistence (per-message, survives after streaming) | Done |
+| Per-message grouping with timestamp and content snippet | Done |
+| Activity stats summary (Total, Memory, Web, Errors) | Done |
+| Expandable detail cards (input/output JSON, duration) | Done |
+| Live activity section (running tools with pulse animation) | Done |
+| Mutual exclusion with Memory panel (only one open at a time) | Done |
+| Clickable tool badges in message footer (opens panel) | Done |
+| Memory usage indicator (count in stats bar) | Done |
+| Web search indicator (count in stats bar) | Done |
+| MCP tool execution indicator (all tools tracked) | Done |
 
 ---
 

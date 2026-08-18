@@ -54,6 +54,14 @@ export interface ToolCall {
   completedAt?: number;
 }
 
+// Web Search Types
+
+export interface SearchSource {
+  title: string;
+  url: string;
+  snippet?: string;
+}
+
 // Memory System Types
 
 export type MemoryType = 'fact' | 'preference' | 'episodic';
